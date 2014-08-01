@@ -6,7 +6,9 @@ var url = require('url');
 
 mongoose.connect('mongodb://localhost/membership');
 
-exports.connect = function(){
+
+
+/*exports.connect = function(){
 	
 	// get the database connection pool
 	mongoose.connect(dbURI);
@@ -36,7 +38,7 @@ exports.connect = function(){
 	});
 
 };
-
+*/
 
 
 var db = mongoose.connection;
@@ -248,11 +250,5 @@ exports.insertData= function(req,res){
 	res.status(200);
 	res.redirect(url.parse(req.url, true).query.url);
 };
-
-
-
-
-
-
 
 

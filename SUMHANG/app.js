@@ -7,7 +7,7 @@ var express = require('express')
   , routes = require('./routes')
   , user = require('./routes/user')
   , http = require('http')
-  , engine = require('ejs-locals')
+/*  , engine = require('ejs-locals')*/
   , fs = require('fs')
   , util = require('util')
   , crypto = require('crypto')
@@ -54,7 +54,7 @@ app.use(express.session({secret:'keyboard cat', cookie:{maxAge:600000}}));
 app.use(createSession());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
-app.engine('ejs',engine);
+
  
 app.get('/',routes.index);
 
@@ -68,13 +68,47 @@ app.post('/LOGIN', function(req,res,next){
 	req.username = req.body.username;
 	req.password = myHash(req.body.password);
 	next();
-},routes,login_post);
+},routes.login_post);
 
 app.get('/LOGOUT', routes.logout);
 
+app.get('/SIGN_UP', routes.sign_up);
+app.post('/SIGN_UP',function(req,res,next){
+	if(req.body.password == req.body.confirm_password){
+		req.username = req.body.username;
+		req.password = myHash(req.body.password);
+		req.email = req.body.email;
+		next();
+	}
+	else{
+		res.redirect('/');
+	};
+},routes.sign_up_post);
 
 
- 
+app.get('/CHECKUSERNAME',routes.checkusername);
+
+
+app.post('/UPLOAD', function(req,res){
+	var str=req.header('User-Agent');
+	var os = str.search("Win");
+	var fileName = req.files.file.path;
+	if(os == -1) {
+		fileName = fileName.split('/')[fileName.split('/').length-1];
+	}
+	else{
+		fileName=fileName.split('\\')[fileName.split('\\').length-1];
+	}
+	res.writeHeader(200,{'Content-Type':'text/plain'});
+	res.write('&bNewLine=true');
+	res.write('&sFileName='+fileName);
+	res.write('&sFileURL=/se/uploadTmp/'+fileName);
+	res.end();
+});
+
+
+
+
 
 /*var createSession = function createSession{
 	return function(req, res, next){
@@ -149,6 +183,7 @@ http.createServer(app).listen(app.get('port'), function(){
 });
 
 
+app.post('/SUBMIT', routes.insertData);
 
 
 
